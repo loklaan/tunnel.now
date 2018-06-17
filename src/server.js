@@ -24,6 +24,7 @@ const server = createServer((req, res) => {
   if (!activeConnection) {
     res.statusCode = 503;
     res.end("Tunneling client is not currently connected.");
+    return;
   }
 
   getRawBody(req).then(buffer => {
