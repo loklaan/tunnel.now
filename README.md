@@ -10,8 +10,6 @@ Of course, you _could_ make changes, deploy to `now`, and update the alias as yo
 
 ```
 $ npm install -g tunnel.now
-/Users/dbustad/.nodenv/versions/8.0.0/bin/tunnel.now -> /Users/dbustad/.nodenv/versions/8.0.0/lib/node_modules/tunnel.now/src/tunnel.js
-added 79 packages in 4.609s
 ```
 
 **Step 2: Update npm links (optional)**
@@ -26,8 +24,16 @@ $ nodenv rehash
 
 ```
 $ tunnel.deploy
-tunnel.now host has been deployed to tunnelnow-qtsdkdfibi.now.sh
-Done!
+
+  _                                _
+ | |_   _  _   _ _    _ _    ___  | |      _ _    ___  __ __ __
+ |  _| | || | | ' \  | ' \  / -_) | |  _  | ' \  / _ \ \ V  V /
+  \__|  \_,_| |_||_| |_||_| \___| |_| (_) |_||_| \___/  \_/\_/
+
+✔ Deployed tunnel.now instance on tunnelnow-xrjajpfyyl.now.sh
+
+  Tunnel Usage:
+   `tunnel.now tunnelnow-xrjajpfyyl.now.sh <local-port>`
 
 ```
 
@@ -35,16 +41,38 @@ You can also alias directly at this step, like so:
 
 ```
 $ tunnel.deploy my-alias.now.sh
-tunnel.now host has been deployed to tunnelnow-qtsdkdfibi.now.sh
-setting alias "my-alias.now.sh"...
 
-> tunnel.divmain.com is a custom domain.
-> Verifying the DNS settings for my-alias.now.sh (see https://zeit.world for help)
-> Verification OK!
-> Success! my-alias.now.sh now points to tunnelnow-qtsdkdfibi.now.sh! [802ms]
+  _                                _
+ | |_   _  _   _ _    _ _    ___  | |      _ _    ___  __ __ __
+ |  _| | || | | ' \  | ' \  / -_) | |  _  | ' \  / _ \ \ V  V /
+  \__|  \_,_| |_||_| |_||_| \___| |_| (_) |_||_| \___/  \_/\_/
 
-Done!
+✔ Deployed tunnel.now instance on tunnelnow-xrjajpfyyl.now.sh
+✔ Pointing my-alias.now.sh to tunnelnow-xrjajpfyyl.now.sh
+
+  Tunnel Usage:
+   `tunnel.now my-alias.now.sh <local-port>`
+
 ```
+
+As well as adding security through a token:
+
+```
+$ tunnel.deploy --token Tu0IH5IVwv5k
+
+  _                                _
+ | |_   _  _   _ _    _ _    ___  | |      _ _    ___  __ __ __
+ |  _| | || | | ' \  | ' \  / -_) | |  _  | ' \  / _ \ \ V  V /
+  \__|  \_,_| |_||_| |_||_| \___| |_| (_) |_||_| \___/  \_/\_/
+
+✔ Deployed tunnel.now instance on tunnelnow-xrjajpfyyl.now.sh
+✔ Pointing my-alias.now.sh to tunnelnow-xrjajpfyyl.now.sh
+
+  Tunnel Usage:
+   `tunnel.now tunnelnow-xrjajpfyyl.now.sh <local-port> --token Tu0IH5IVwv5k`
+
+```
+
 
 Note that this deployment can be re-used however many times you'd like.
 
@@ -61,25 +89,51 @@ In this case, that's port `8080`.
 
 **Step 5: In a separate terminal, start your tunnel**
 
-`tunnel.now` takes two arguments:
+`tunnel.now` takes three arguments:
 
 1. The `now` hostname.  This will be either the hostname that `now` provided to you, or the alias that you specified during step 3.  That's `my-alias.now.sh` in the example above.
 2. The port one which your locally-running application is listening. That's `8080` in the example above.
+3. The `token` argument, which is only required if you specified one during step 3.
 
 ```
-$ tunnel.now my-alias.now.sh 8080
-Connected to wss://my-alias.now.sh:443.
-Tunneling requests to http://localhost:8080...
+$ tunnel.now my-alias.now.sh 8080 --token Tu0IH5IVwv5k
+
+  _                                _
+ | |_   _  _   _ _    _ _    ___  | |      _ _    ___  __ __ __
+ |  _| | || | | ' \  | ' \  / -_) | |  _  | ' \  / _ \ \ V  V /
+  \__|  \_,_| |_||_| |_||_| \___| |_| (_) |_||_| \___/  \_/\_/
+
+✔ Connected to wss://my-alias.now.sh:443
+ℹ Tunneling requests to http://localhost:8080
+
 ```
 
 **Step 6: Open your browser!**
 
 Any HTTP requests made to the `now` hostname or alias will be tunneled to your local machine.
 
+## Module API
+
+You can also open a tunnel connection through `require('@rexlabs/tunnel.now')`.
+
+```js
+const TunnelNow = require('@rexlabs/tunnel.now')
+
+const tunnelSocket = TunnelNow({
+  remoteHostname: 'my-alias.now.sh',
+  localPort: '8080',
+  token: 'Tu0IH5IVwv5k'
+})
+
+tunnelSocket.addEventListener('open', () => {
+  console.log('Connected!')
+})
+```
 
 ## FAQ
 
-**Does this work with other services?**  Yes.  The only hard requirement is that the host provides HTTP and WebSocket support.  However, you will need to deploy the `tunnel.now` repo yourself.
+**Does this work with other services?**  
+Yes.  The only hard requirement is that the host provides HTTP and WebSocket support.  However, you will need to deploy the `tunnel.now` repo yourself.
 
 
 ## License

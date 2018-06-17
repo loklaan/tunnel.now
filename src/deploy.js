@@ -22,19 +22,10 @@ const run = (...cmd) => {
 };
 
 const main = async () => {
-  let { _: [ alias, auth ] } = yargs
-    .usage('tunnel.deploy [alias] [user:password]')
+  let { _: [ alias ], token } = yargs
+    .usage('tunnel.deploy [alias] [--token key]')
     .help()
     .argv;
-
-
-  if (!auth && alias.match(/\w+:\w+/)) {
-    auth = alias;
-    alias = undefined;
-  }
-  if (auth && !auth.match(/\w+:\w+/)) {
-    throw new Error('Invalid basic auth syntax ("username:password")')
-  }
 
   splash();
 
@@ -42,7 +33,7 @@ const main = async () => {
   const logger = ora(`${chalk.dim(`[1/${totalSteps}] -`)} Deploying instance`).start();
 
   const deployArgs = ["now", "deploy"]
-    .concat(auth ? ["-e", `TUNNEL_BASIC_AUTH=${auth}`] : []);
+    .concat(token ? ["-e", `TUNNEL_TOKEN=${token}`] : []);
   const { stdout: deployedUrl } = await run.apply(null, deployArgs);
   const hostname = deployedUrl.replace(/https?:\/\//, "");
   logger.succeed(`Deployed tunnel.now instance on ${hostname}`);
@@ -52,7 +43,7 @@ const main = async () => {
     const aliasHostname = message.match(/Success! (.*) now points/)[1];
     logger.succeed(`Pointing ${chalk.underline(aliasHostname)} to ${chalk.underline(hostname)}`);
   }
-  console.log(chalk.default.dim(`\n  Tunnel Usage:\n   \`tunnel.now ${alias}.now.sh <local-port>${auth ? ` ${auth}` : ''}\``));
+  console.log(chalk.default.dim(`\n  Tunnel Usage:\n   \`tunnel.now ${alias ? alias : hostname} <local-port>${token ? ` --token ${token}` : ''}\``));
 };
 
 main().catch(err => {

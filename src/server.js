@@ -54,13 +54,13 @@ const handleResponse = message => {
 };
 
 const verifyClient = (info, cb) => {
-  if (process.env.TUNNEL_BASIC_AUTH) {
-    const rawAuth = info.req.headers.authorization;
-    if (rawAuth) {
-      const decodedAuth = Buffer.from(rawAuth.split(' ')[1], 'base64').toString();
-      if (decodedAuth === process.env.TUNNEL_BASIC_AUTH) {
-        return cb(true);
-      }
+  if (process.env.TUNNEL_TOKEN) {
+    const tokenKey = info.req.headers.token;
+    console.log(info.req.headers);
+    console.log(tokenKey);
+    console.log(process.env.TUNNEL_TOKEN);
+    if (tokenKey === process.env.TUNNEL_TOKEN) {
+      return cb(true);
     }
     cb(false, 401, STATUS_CODES[401]);
   } else {

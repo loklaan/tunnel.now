@@ -11,10 +11,10 @@ const {
   request: { decode: decodeRequest },
   response: { encode: encodeResponse }
 } = require("./codec");
-const getSocketUrl = (auth, hostname) =>
-  `wss://${auth ? `${auth}@` : ''}${hostname}:443`;
+const getSocketUrl = (hostname) =>
+  `wss://${hostname}:443`;
 
-const tunnel = (remoteHostname, localPort, auth) => {
+const tunnel = (remoteHostname, localPort, token) => {
 
   if (!remoteHostname) {
     throw new Error("You must supply a name for a remote host, listening on port 443.");
@@ -25,8 +25,8 @@ const tunnel = (remoteHostname, localPort, auth) => {
 
   const baseTargetUrl = `http://localhost:${localPort}`;
 
-  const uri = getSocketUrl(auth, remoteHostname);
-  const socket = new WebSocket(uri);
+  const uri = getSocketUrl(remoteHostname);
+  const socket = new WebSocket(uri, null, { headers: {token} });
 
   socket.addEventListener("message", ev => {
     const {
@@ -67,20 +67,20 @@ const tunnel = (remoteHostname, localPort, auth) => {
 };
 
 if (require.main !== module) {
-  module.exports = ({ remoteHostname, localPort, auth } = {}) =>
-    tunnel(remoteHostname, localPort, auth)
+  module.exports = ({ remoteHostname, localPort, token } = {}) =>
+    tunnel(remoteHostname, localPort, token)
 } else {
-  let { _: [ remoteHostname, localPort, auth ] } = yargs
-    .usage('tunnel.now <remote-hostname> <local-port> [user:password]')
+  let { _: [ remoteHostname, localPort ], token } = yargs
+    .usage('tunnel.now <remote-hostname> <local-port> [--token key]')
     .help()
     .argv;
   try {
     splash();
     const logger = ora().start('Connecting to tunnel...');
-    const socket = tunnel(remoteHostname, localPort, auth);
+    const socket = tunnel(remoteHostname, localPort, token);
 
     socket.addEventListener("open", () => {
-      logger.succeed(`Connected to ${getSocketUrl(auth, remoteHostname)}.`);
+      logger.succeed(`Connected to ${getSocketUrl(remoteHostname)}`);
       logger.info(`Tunneling requests to http://localhost:${localPort}`);
     });
 
@@ -97,7 +97,7 @@ if (require.main !== module) {
       if (ev.code === "ECONNREFUSED") {
         logger.warn("We were unable to establish a connection with the server.");
       } else if (ev.target._req.res.statusCode === 401) {
-        logger.fail(`Incorrect auth details (${chalk.bold(auth)}) provided.`);
+        logger.fail(`Incorrect token (${chalk.bold(token)}) provided.`);
       } else {
         logger.warn(ev.toString());
       }
