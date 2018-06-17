@@ -13,6 +13,7 @@
     "tunnel.now": "./src/tunnel.js",
     "tunnel.deploy": "./src/deploy.js"
   },
+  "main": "src/tunnel",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/divmain/tunnel.now.git"
@@ -33,8 +34,10 @@
   "homepage": "https://github.com/divmain/tunnel.now#readme",
   "dependencies": {
     "cereal-box": "^1.0.0",
+    "chalk": "^2.4.1",
     "execa": "^0.7.0",
     "node-fetch": "^1.7.1",
+    "ora": "^2.1.0",
     "raw-body": "^2.2.0",
     "ws": "^3.0.0",
     "yargs": "^8.0.1"

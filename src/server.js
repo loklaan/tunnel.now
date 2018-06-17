@@ -1,4 +1,4 @@
-const { createServer } = require("http");
+const { createServer, STATUS_CODES } = require("http");
 
 const yargs = require("yargs");
 const WebSocket = require("ws");
@@ -53,7 +53,22 @@ const handleResponse = message => {
   res.end(Buffer.from(body.buffer, body.byteOffset, body.length));
 };
 
-const wsServer = new WebSocket.Server({ server });
+const verifyClient = (info, cb) => {
+  if (process.env.TUNNEL_BASIC_AUTH) {
+    const rawAuth = info.req.headers.authorization;
+    if (rawAuth) {
+      const decodedAuth = Buffer.from(rawAuth.split(' ')[1], 'base64').toString();
+      if (decodedAuth === process.env.TUNNEL_BASIC_AUTH) {
+        return cb(true);
+      }
+    }
+    cb(false, 401, STATUS_CODES[401]);
+  } else {
+    cb(true);
+  }
+};
+
+const wsServer = new WebSocket.Server({ server, verifyClient });
 wsServer.on("connection", (ws, req) => {
   if (activeConnection) { ws.close("A client is already connected."); }
   const remoteIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
