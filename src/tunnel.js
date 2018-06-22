@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const ora = require('ora');
+const _ = require("lodash");
 const chalk = require('chalk');
 const yargs = require("yargs");
 const WebSocket = require("ws");
@@ -96,7 +97,7 @@ if (require.main !== module) {
     socket.addEventListener("error", ev => {
       if (ev.code === "ECONNREFUSED") {
         logger.warn("We were unable to establish a connection with the server.");
-      } else if (ev.target._req.res.statusCode === 401) {
+      } else if (_.get(ev, 'target._req.res.statusCode') === 401) {
         logger.fail(`Incorrect token (${chalk.bold(token)}) provided.`);
       } else {
         logger.warn(ev.toString());
