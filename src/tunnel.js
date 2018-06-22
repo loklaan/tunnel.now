@@ -26,7 +26,7 @@ const tunnel = (remoteHostname, localPort, token) => {
   const baseTargetUrl = `http://localhost:${localPort}`;
 
   const uri = getSocketUrl(remoteHostname);
-  const socket = new WebSocket(uri, null, { headers: {token} });
+  const socket = new WebSocket(uri, null, { headers: token ? {token} : {} });
 
   socket.addEventListener("message", ev => {
     const {
