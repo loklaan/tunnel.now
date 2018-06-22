@@ -1,6 +1,6 @@
 {
   "name": "@rexlabs/tunnel.now",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "engines": {
     "node": "^9.0.0"
   },
