@@ -31,7 +31,6 @@ const tunnel = (remoteHostname, localPort, token, remotePort) => {
     'Cookie': '_now_no_cache=1'
   };
   if (token) headers = Object.assign(headers, { token });
-  console.log(uri, headers)
   const socket = new WebSocket(uri, null, { headers });
 
   socket.addEventListener("message", ev => {
