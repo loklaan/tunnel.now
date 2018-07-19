@@ -12,10 +12,10 @@ const {
   request: { decode: decodeRequest },
   response: { encode: encodeResponse }
 } = require("./codec");
-const getSocketUrl = (hostname) =>
-  `wss://${hostname}:443`;
+const getSocketUrl = (hostname, remotePort) =>
+  `${remotePort === '443' ? 'wss' : 'ws'}://${hostname}:${remotePort}`;
 
-const tunnel = (remoteHostname, localPort, token) => {
+const tunnel = (remoteHostname, localPort, token, remotePort) => {
 
   if (!remoteHostname) {
     throw new Error("You must supply a name for a remote host, listening on port 443.");
@@ -26,8 +26,13 @@ const tunnel = (remoteHostname, localPort, token) => {
 
   const baseTargetUrl = `http://localhost:${localPort}`;
 
-  const uri = getSocketUrl(remoteHostname);
-  const socket = new WebSocket(uri, null, { headers: token ? {token} : {} });
+  const uri = getSocketUrl(remoteHostname, remotePort);
+  let headers = {
+    'Cookie': '_now_no_cache=1'
+  };
+  if (token) headers = Object.assign(headers, { token });
+  console.log(uri, headers)
+  const socket = new WebSocket(uri, null, { headers });
 
   socket.addEventListener("message", ev => {
     const {
@@ -75,13 +80,20 @@ if (require.main !== module) {
     .usage('tunnel.now <remote-hostname> <local-port> [--token key]')
     .help()
     .argv;
+  const portMatchings = remoteHostname.match(/(?!:)\d+/);
+  let remotePort = portMatchings && portMatchings.length && portMatchings[0];
+  if (remotePort) {
+    remoteHostname = remoteHostname.replace(/(.*):(\d+)(.*)/, '$1');
+  } else {
+    remotePort = '443';
+  }
   try {
     splash();
     const logger = ora().start('Connecting to tunnel...');
-    const socket = tunnel(remoteHostname, localPort, token);
+    const socket = tunnel(remoteHostname, localPort, token, remotePort);
 
     socket.addEventListener("open", () => {
-      logger.succeed(`Connected to ${getSocketUrl(remoteHostname)}`);
+      logger.succeed(`Connected to ${getSocketUrl(remoteHostname, remotePort)}`);
       logger.info(`Tunneling requests to http://localhost:${localPort}`);
     });
 
@@ -100,7 +112,7 @@ if (require.main !== module) {
       } else if (_.get(ev, 'target._req.res.statusCode') === 401) {
         logger.fail(`Incorrect token (${chalk.bold(token)}) provided.`);
       } else {
-        logger.warn(ev.toString());
+        logger.fail(ev.toString());
       }
     });
   } catch (err) {
