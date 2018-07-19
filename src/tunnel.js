@@ -72,8 +72,8 @@ const tunnel = (remoteHostname, localPort, token, remotePort) => {
 };
 
 if (require.main !== module) {
-  module.exports = ({ remoteHostname, localPort, token } = {}) =>
-    tunnel(remoteHostname, localPort, token)
+  module.exports = ({ remoteHostname, localPort, token, remotePort = '433' } = {}) =>
+    tunnel(remoteHostname, localPort, token, remotePort);
 } else {
   let { _: [ remoteHostname, localPort ], token } = yargs
     .usage('tunnel.now <remote-hostname> <local-port> [--token key]')
