@@ -72,7 +72,7 @@ const tunnel = (remoteHostname, localPort, token, remotePort) => {
 };
 
 if (require.main !== module) {
-  module.exports = ({ remoteHostname, localPort, token, remotePort = '433' } = {}) =>
+  module.exports = ({ remoteHostname, localPort, token, remotePort = '443' } = {}) =>
     tunnel(remoteHostname, localPort, token, remotePort);
 } else {
   let { _: [ remoteHostname, localPort ], token } = yargs
