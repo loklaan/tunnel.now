@@ -1,5 +1,5 @@
 {
-  "name": "@rexlabs/tunnel.now",
+  "name": "@loklaan/tunnel.now",
   "version": "2.0.6",
   "engines": {
     "node": ">9.0.0"
@@ -16,7 +16,7 @@
   "main": "src/tunnel",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/divmain/tunnel.now.git"
+    "url": "git+https://github.com/loklaan/tunnel.now.git"
   },
   "keywords": [
     "zeit",
@@ -27,11 +27,12 @@
     "https"
   ],
   "author": "Dale Bustad <dale@divmain.com>",
+  "contributors": [ "Lochlan Bunn <bunn@lochlan.io>" ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/divmain/tunnel.now/issues"
+    "url": "https://github.com/loklaan/tunnel.now/issues"
   },
-  "homepage": "https://github.com/divmain/tunnel.now#readme",
+  "homepage": "https://github.com/loklaan/tunnel.now#readme",
   "dependencies": {
     "cereal-box": "^1.0.0",
     "chalk": "^2.4.2",
