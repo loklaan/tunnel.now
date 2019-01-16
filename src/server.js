@@ -5,7 +5,8 @@ const getRawBody = require("raw-body");
 
 const {
   request: { encode: encodeRequest },
-  response: { decode: decodeResponse }
+  response: { decode: decodeResponse },
+  responseJson: { decode: decodeJsonResponse },
 } = require("./codec");
 
 let activeConnection = null;
@@ -39,17 +40,36 @@ const server = createServer((req, res) => {
     });
 });
 
-const handleResponse = message => {
+const handleResponseWithDecoderFallbacks = (message, decoders, decoderIndex = 0) => {
   if (message === "PING") { return; }
-  const { id, statusCode, headers, body } = decodeResponse(message);
-  const res = responseRefs[id];
-  responseRefs[id] = null;
+  try {
+    const { id, statusCode, headers, body } = decoders[decoderIndex](message);
+    const res = responseRefs[id];
+    responseRefs[id] = null;
 
-  res.statusCode = statusCode;
-  Object.keys(headers).forEach(key => res.setHeader(key, headers[key]));
-  // Alternately, `Buffer.from(body.slice().buffer)`.
-  res.end(Buffer.from(body.buffer, body.byteOffset, body.length));
+    res.statusCode = statusCode;
+    Object.keys(headers).forEach(key => res.setHeader(key, headers[key]));
+    // Alternately, `Buffer.from(body.slice().buffer)`.
+    res.end(Buffer.from(body.buffer, body.byteOffset, body.length));
+  } catch (err) {
+    if ((decoderIndex + 1) in decoders) {
+      console.error('Error handling response. Retrying with different decoder.')
+      handleResponseWithDecoderFallbacks(message, decoders, decoderIndex + 1);
+    } else {
+      console.error('Error handling response.')
+      console.error('Message:', message.toString('utf8'))
+      console.error('Error:')
+      console.error(err)
+    }
+  }
 };
+const handleResponse = (message) => handleResponseWithDecoderFallbacks(
+  message,
+  [
+    decodeResponse,
+    decodeJsonResponse,
+  ]
+);
 
 const verifyClient = (info, cb) => {
   if (process.env.TUNNEL_TOKEN) {

@@ -15,3 +15,10 @@ exports.response = codec({
   headers: "json",
   body: "u8"
 });
+
+exports.responseJson = codec({
+  id: "int",
+  statusCode: "int",
+  headers: "json",
+  body: "json"
+});
