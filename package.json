@@ -1,6 +1,6 @@
 {
   "name": "@loklaan/tunnel.now",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "engines": {
     "node": ">9.0.0"
   },
@@ -27,7 +27,9 @@
     "https"
   ],
   "author": "Dale Bustad <dale@divmain.com>",
-  "contributors": [ "Lochlan Bunn <bunn@lochlan.io>" ],
+  "contributors": [
+    "Lochlan Bunn <bunn@lochlan.io>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/loklaan/tunnel.now/issues"
