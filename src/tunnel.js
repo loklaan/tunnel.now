@@ -42,11 +42,15 @@ const tunnel = (remoteHostname, localPort, token, remotePort) => {
       body
     } = decodeRequest(ev.data);
 
+    const _method = method || 'GET'
+    let _body = ['get', 'head'].includes(_method.toLowerCase())
+      ? null
+      : Buffer.from(body.buffer, body.byteOffset, body.length);
     fetch(`${baseTargetUrl}${url}`, {
       method,
       headers,
       // Alternately, `Buffer.from(body.slice().buffer)`.
-      body: Buffer.from(body.buffer, body.byteOffset, body.length),
+      body: _body,
       redirect: "manual"
     }).then(response => {
       return response.buffer().then(body => {
